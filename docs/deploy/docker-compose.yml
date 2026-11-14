@@ -1,0 +1,54 @@
+# docker-compose.yml — déploiement de Math en production (math.giet.fr)
+# -----------------------------------------------------------------------------
+# Math est une SPA (Vite + React) servie par nginx. Le pipeline GitHub Actions
+# (.github/workflows/build-and-deploy.yml) construit l'image et la pousse sur
+# Docker Hub :
+#   - branche main         → elypso/math:latest
+#   - branches feature/**  → elypso/math:feature
+#
+# Le conteneur partage le réseau Docker « mlt-network » avec MltStore : son
+# nginx interne relaie /api/ vers le conteneur mltstore-api. Le navigateur parle
+# donc à MltStore en same-origin, sans URL publique ni CORS. La connexion Google
+# passe aussi par là (/api/auth/google). Le conteneur mltstore-api doit tourner
+# sur ce même réseau, avec le module Maths.
+#
+# Aucune variable d'environnement : l'image est construite en mode MltStore et
+# tout le reste est relatif, résolu par nginx.
+#
+# Côté serveur :
+#   1. docker network create mlt-network   (si le réseau n'existe pas déjà)
+#   2. Copier ce fichier dans /opt/math/docker-compose.yml
+#   3. docker compose pull && docker compose up -d
+#   4. Poser le vhost nginx de l'hôte (voir nginx-math.giet.fr.conf)
+# -----------------------------------------------------------------------------
+
+services:
+  math:
+    # Le tag par défaut suit la branche main. Mettre MATH_TAG=feature dans
+    # l'environnement de la pile pour suivre les builds des branches feature.
+    image: elypso/math:${MATH_TAG:-latest}
+    container_name: math
+    restart: unless-stopped
+    networks:
+      - mlt-network
+    ports:
+      # Port hôte 40302 → nginx du conteneur. Le vhost de l'hôte proxifie
+      # math.giet.fr vers ce port. Publié sur toutes les interfaces : le nginx
+      # de façade joint le conteneur par l'IP de l'hôte Docker. Ports déjà pris
+      # sur le serveur : 40000 dashboard, 40001 mlt-api, 40004 mlt, 40010
+      # famille, 40011 cousinade préprod, 40020 games, 40030 racine, 40040 dex,
+      # 40050 notes, 40060 sondage, 40070 learn, 40080 1to1, 40090 carte,
+      # 40110 MltStore, 40301 tree.
+      - "40302:80"
+    mem_limit: 128m
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 3s
+      start_period: 15s
+      retries: 3
+
+networks:
+  # Réseau partagé avec MltStore. Déclaré « external » : il doit déjà exister.
+  mlt-network:
+    external: true

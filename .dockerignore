@@ -1,0 +1,14 @@
+node_modules
+dist
+.git
+.github
+.claude
+.env
+.env.*
+*.local
+npm-debug.log*
+.vite
+*.tsbuildinfo
+docs
+maquette
+**/.DS_Store

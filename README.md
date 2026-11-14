@@ -1,8 +1,9 @@
 # math — Entraînement aux calculs
 
-Application de calcul mental pour enfants : séries de 10 calculs adaptées au niveau
-de chaque enfant, évaluation de 25 questions, badges, et un espace parent protégé
-par code qui suit les progrès.
+Application de calcul mental pour enfants : séries de 10 à 25 calculs adaptées au
+niveau de chaque enfant, révision des tables de multiplication, calculs à trous,
+évaluation de 25 questions, badges, et un espace parent protégé par code qui suit
+les progrès. En production : **https://math.giet.fr**.
 
 ## Démarrer
 
@@ -22,4 +23,5 @@ MltStore, copier `.env.example` en `.env.local` et poser `VITE_DATA_MODE=mltstor
 - [docs/AGENTS.md](docs/AGENTS.md) — conventions techniques du stack
 - [docs/PROJECT_SPECIFIC.md](docs/PROJECT_SPECIFIC.md) — règles métier et contrat MltStore
 - [docs/PROJECT_UX.md](docs/PROJECT_UX.md) — interface
+- [docs/deploy/README.md](docs/deploy/README.md) — pipeline et déploiement sur math.giet.fr
 - `maquette/` et `assets/` — maquette d'origine, icônes et logo

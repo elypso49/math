@@ -1,0 +1,125 @@
+name: Math Build & Deploy
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+      - 'develop'
+      - 'main'
+    paths:
+      - 'src/**'
+      - 'assets/**'
+      - 'public/**'
+      - 'package*.json'
+      - 'tsconfig*.json'
+      - 'vite.config.ts'
+      - 'index.html'
+      - 'Dockerfile'
+      - 'nginx.conf'
+      - '.dockerignore'
+      - '.github/workflows/build-and-deploy.yml'
+  workflow_dispatch:
+
+env:
+  TAG_LATEST: latest
+  TAG_FEATURE: feature
+  IMAGE_NAME: math
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Unit tests (Vitest)
+        run: |
+          mkdir -p test-results
+          npm test -- --reporter=default --reporter=junit --outputFile=test-results/junit.xml
+
+      - name: Publish test report
+        uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3.0.0
+        if: ${{ !cancelled() }}
+        with:
+          name: Tests
+          path: test-results/junit.xml
+          reporter: java-junit
+          fail-on-error: true
+
+      - name: Type-check & build
+        run: npm run build
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Check Docker Hub credentials
+        run: |
+          if [ -z '${{ secrets.DOCKER_USERNAME }}' ] || [ -z '${{ secrets.DOCKER_PASSWORD }}' ]; then
+            echo "PUBLISH=false" >> $GITHUB_ENV
+            echo "::warning::DOCKER_USERNAME / DOCKER_PASSWORD absents — l'image est construite mais pas publiée, et le déploiement est ignoré."
+          else
+            echo "PUBLISH=true" >> $GITHUB_ENV
+          fi
+
+      - name: Log in to Docker Hub
+        if: ${{ env.PUBLISH == 'true' }}
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Determine Docker tag and webhook
+        run: |
+          if [[ '${{ github.ref }}' == 'refs/heads/main' ]]; then
+            echo "TAG=${{ env.TAG_LATEST }}" >> $GITHUB_ENV
+            if [ -z '${{ secrets.PROD_MATH_WEBHOOK }}' ] || [ '${{ secrets.PROD_MATH_WEBHOOK }}' = 'placeholder' ]; then
+              echo "WEBHOOK=" >> $GITHUB_ENV
+              echo "ℹ️  PROD_MATH_WEBHOOK non défini — déploiement automatique ignoré."
+            else
+              echo "WEBHOOK=${{ secrets.PROD_MATH_WEBHOOK }}" >> $GITHUB_ENV
+            fi
+          else
+            echo "TAG=${{ env.TAG_FEATURE }}" >> $GITHUB_ENV
+            if [ -z '${{ secrets.QUALIF_MATH_WEBHOOK }}' ] || [ '${{ secrets.QUALIF_MATH_WEBHOOK }}' = 'placeholder' ]; then
+              echo "WEBHOOK=" >> $GITHUB_ENV
+              echo "ℹ️  QUALIF_MATH_WEBHOOK non défini — déploiement automatique ignoré."
+            else
+              echo "WEBHOOK=${{ secrets.QUALIF_MATH_WEBHOOK }}" >> $GITHUB_ENV
+            fi
+          fi
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: Dockerfile
+          push: ${{ env.PUBLISH == 'true' }}
+          tags: ${{ secrets.DOCKER_USERNAME || 'local' }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Trigger deployment webhook
+        if: ${{ env.WEBHOOK != '' && env.PUBLISH == 'true' }}
+        run: |
+          curl -fsS -X POST "${{ env.WEBHOOK }}"
