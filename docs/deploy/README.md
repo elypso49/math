@@ -8,8 +8,10 @@ de l'hôte, sur **math.giet.fr**.
 |---|---|
 | Dépôt GitHub | `elypso49/math` |
 | Image Docker Hub | `elypso/math` |
-| Port hôte | `40302` |
+| Port hôte | `40303` (40302 sert déjà biblio.giet.fr) |
 | Réseau Docker | `mlt-network`, externe, partagé avec MltStore |
+| Serveur | `bakaserver` (192.168.1.16), joignable en SSH par l'alias `giet` |
+| Certificat | joker `*.giet.fr` / `*.giet.xyz`, déjà en place |
 | URL publique | `https://math.giet.fr` |
 
 ## Ce dont Math dépend côté MltStore
@@ -74,38 +76,27 @@ Le job `test` lance `npm ci`, les tests Vitest (rapport publié dans l'onglet
 
 ## Premier déploiement
 
+Les commandes Docker et nginx demandent les droits root sur le serveur.
+
 ```bash
-# 1. Le réseau partagé avec MltStore doit exister
+# 1. DNS : créer l'enregistrement math.giet.fr chez le registraire, comme les
+#    autres sous-domaines (pas d'enregistrement joker sur giet.fr)
+
+# 2. Le réseau partagé avec MltStore doit exister
 docker network create mlt-network || true
 
-# 2. Poser le compose
+# 3. Poser le compose et démarrer (ou créer la pile équivalente dans Portainer)
 mkdir -p /opt/math
 cp docker-compose.yml /opt/math/docker-compose.yml
-
-# 3. Démarrer
 cd /opt/math && docker compose pull && docker compose up -d
 
-# 4. Le certificat AVANT le bloc 443 — voir ci-dessous
-```
-
-### Le certificat d'abord, le vhost ensuite
-
-Écrire le bloc `listen 443` avant d'avoir le certificat rend `nginx -t`
-invalide, et certbot refuse alors de travailler : il a besoin d'une
-configuration qui passe le test. L'ordre est donc contraint.
-
-```bash
-# 1. Seul le bloc 80 de math.giet.fr est posé
-nginx -t && systemctl reload nginx
-
-# 2. Obtenir le certificat sans toucher aux vhosts
-certbot certonly --nginx -d math.giet.fr
-
-# 3. Poser le bloc 443, puis recharger
+# 4. Ajouter le bloc de nginx-math.giet.fr.conf dans /etc/nginx/sites-available/giet
 nginx -t && systemctl reload nginx
 ```
 
-Le DNS de `math.giet.fr` doit pointer vers le serveur avant l'étape 2.
+Aucun certificat à demander : le certificat joker `*.giet.fr` inclus par
+`snippets/giet-https.conf` couvre `math.giet.fr`, et la redirection HTTP vers
+HTTPS est commune à tous les sous-domaines.
 
 ## Mise à jour
 

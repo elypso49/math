@@ -19,7 +19,7 @@
 #   1. docker network create mlt-network   (si le réseau n'existe pas déjà)
 #   2. Copier ce fichier dans /opt/math/docker-compose.yml
 #   3. docker compose pull && docker compose up -d
-#   4. Poser le vhost nginx de l'hôte (voir nginx-math.giet.fr.conf)
+#   4. Poser le bloc nginx de l'hôte (voir nginx-math.giet.fr.conf)
 # -----------------------------------------------------------------------------
 
 services:
@@ -32,14 +32,14 @@ services:
     networks:
       - mlt-network
     ports:
-      # Port hôte 40302 → nginx du conteneur. Le vhost de l'hôte proxifie
+      # Port hôte 40303 → nginx du conteneur. Le vhost de l'hôte proxifie
       # math.giet.fr vers ce port. Publié sur toutes les interfaces : le nginx
       # de façade joint le conteneur par l'IP de l'hôte Docker. Ports déjà pris
       # sur le serveur : 40000 dashboard, 40001 mlt-api, 40004 mlt, 40010
       # famille, 40011 cousinade préprod, 40020 games, 40030 racine, 40040 dex,
       # 40050 notes, 40060 sondage, 40070 learn, 40080 1to1, 40090 carte,
-      # 40110 MltStore, 40301 tree.
-      - "40302:80"
+      # 40110 MltStore, 40210 Postgres, 40301 tree, 40302 biblio.
+      - "40303:80"
     mem_limit: 128m
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost/"]
