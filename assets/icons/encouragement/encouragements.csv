@@ -1,0 +1,11 @@
+nom,fichier_obtenu,fichier_verrouille,message,condition
+tu-t-ameliores,tu-t-ameliores-obtenu.svg,tu-t-ameliores-verrouille.svg,"Tu t’améliores !","Temps moyen en baisse sur les 3 dernières séries"
+nouveau-record,nouveau-record-obtenu.svg,nouveau-record-verrouille.svg,"Nouveau record !","Meilleur temps total de la série"
+serie-parfaite,serie-parfaite-obtenu.svg,serie-parfaite-verrouille.svg,"10 sur 10 !","Aucune erreur sur la série"
+serie-en-feu,serie-en-feu-obtenu.svg,serie-en-feu-verrouille.svg,"3 séries de suite !","Trois séries terminées à la suite"
+premiere-serie,premiere-serie-obtenu.svg,premiere-serie-verrouille.svg,"Première série !","Première série terminée"
+eclair,eclair-obtenu.svg,eclair-verrouille.svg,"Éclair !","Dix bonnes réponses en moins de 3 minutes"
+pas-lache,pas-lache-obtenu.svg,pas-lache-verrouille.svg,"Tu n’as pas lâché","Série terminée avec au moins 3 erreurs"
+objectif-atteint,objectif-atteint-obtenu.svg,objectif-atteint-verrouille.svg,"Objectif atteint","Au moins 8 bonnes réponses sur 10"
+continue,continue-obtenu.svg,continue-verrouille.svg,"Continue comme ça !","Message après une bonne série"
+presque,presque-obtenu.svg,presque-verrouille.svg,"Presque !","Message après une réponse fausse"

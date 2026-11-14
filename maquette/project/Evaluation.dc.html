@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Évaluation</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#2E7D6B}a:hover{color:#23604F}
+button{font-family:inherit;cursor:pointer}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; padding: 52px 24px 28px; display: flex; flex-direction: column; gap: 24px; background: #F6F5F1; color: #1E2A28; font-family: 'Atkinson Hyperlegible', system-ui, sans-serif;">
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <div style="font-size: 15px; font-weight: 700; color: #5B6664;">Évaluation · question 3 sur 25</div>
+    <div style="height: 10px; border-radius: 6px; background: #E0DED6; overflow: hidden;">
+      <div style="width: 12%; height: 100%; background: #2E7D6B;"></div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 28px 16px; border-radius: 24px; background: #FFFFFF;">
+    <div style="font-size: 16px; color: #5B6664;">Combien font</div>
+    <div style="font-size: 46px; font-weight: 700; letter-spacing: 1px;">7 × 8 =</div>
+    <div aria-live="polite" style="min-width: 160px; min-height: 76px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; padding: 0 20px; border: 3px solid #2E7D6B; border-radius: 18px; font-size: 44px; font-weight: 700; color: #1E2A28;">
+      {{ shown }}
+    </div>
+  </div>
+
+  <sc-if value="{{ isRight }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="display: flex; flex-direction: column; gap: 6px; padding: 18px 20px; border-radius: 18px; background: #E3F1EC; color: #1F5C3A;">
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 22px; font-weight: 700;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>Bravo, c’est juste !</div>
+      <div style="font-size: 17px;">Ta réponse : {{ shown }}</div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ isWrong }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="display: flex; flex-direction: column; gap: 6px; padding: 18px 20px; border-radius: 18px; background: #FDECEA; color: #8A1C12;">
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 22px; font-weight: 700;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>Pas tout à fait.</div>
+      <div style="font-size: 17px;">Ta réponse : {{ shown }}</div>
+      <div style="font-size: 17px; font-weight: 700;">Le bon résultat est 56.</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ answering }}" hint-placeholder-val="{{ true }}">
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+        <sc-for list="{{ digits }}" as="digit" hint-placeholder-count="10">
+          <button type="button" onClick="{{ digit.pick }}" aria-label="{{ digit.label }}" style="flex: 0 0 calc(33.33% - 8px); height: 68px; box-sizing: border-box; border: 2px solid #C9C7BE; border-radius: 18px; background: #FFFFFF; color: #1E2A28; font-size: 30px; font-weight: 700;">{{ digit.label }}</button>
+        </sc-for>
+        <button type="button" onClick="{{ erase }}" aria-label="Effacer le dernier chiffre" style="flex: 0 0 calc(33.33% - 8px); height: 68px; box-sizing: border-box; border: 2px solid #C9C7BE; border-radius: 18px; background: #E9E7E0; color: #1E2A28; display: flex; align-items: center; justify-content: center;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>
+        </button>
+      </div>
+      <button type="button" onClick="{{ validate }}" style="height: 62px; border: 0; border-radius: 18px; background: #2E7D6B; color: #FFFFFF; font-size: 20px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><path d="M20 6 9 17l-5-5"/></svg>Valider</button>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ checked }}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      <button type="button" onClick="{{ next }}" style="height: 62px; border: 0; border-radius: 18px; background: #2E7D6B; color: #FFFFFF; font-size: 20px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px;">Question suivante<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  state = { typed: '', checked: false };
+
+  renderVals() {
+    const typed = this.state.typed;
+    const checked = this.state.checked;
+    const isRight = checked && typed === '56';
+    const isWrong = checked && typed !== '56';
+    const press = digit => () => this.setState({ typed: (this.state.typed + digit).slice(0, 3) });
+    const digits = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].map(digit => ({ label: digit, pick: press(digit) }));
+    return {
+      shown: typed || '?',
+      checked,
+      answering: !checked,
+      isRight,
+      isWrong,
+      digits,
+      erase: () => this.setState({ typed: this.state.typed.slice(0, -1) }),
+      validate: () => {
+        if (this.state.typed)
+          this.setState({ checked: true });
+      },
+      next: () => this.setState({ typed: '', checked: false }),
+    };
+  }
+}
+</script>
+</body>
+</html>

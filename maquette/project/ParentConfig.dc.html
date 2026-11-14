@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Configuration parent</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+a{color:#2E7D6B;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+</helmet>
+<div style="width: 390px; height: 1100px; box-sizing: border-box; padding: 52px 24px 28px; display: flex; flex-direction: column; gap: 20px; background: #F6F5F1; color: #1E2A28; font-family: 'Atkinson Hyperlegible', system-ui, sans-serif;">
+  <div style="display: flex; align-items: center; justify-content: space-between;">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 700;">Configuration</h1>
+    <a href="Main.dc.html" style="display: flex; align-items: center; gap: 6px; height: 44px; padding: 0 14px; border-radius: 999px; background: #1E2A28; color: #FFFFFF; font-size: 15px; font-weight: 700;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Verrouiller</a>
+  </div>
+  <a href="Parent.dc.html" style="font-size: 15px; color: #2E7D6B; font-weight: 700;">Voir les statistiques des enfants →</a>
+
+  <div style="font-size: 19px; font-weight: 700; margin-top: 4px;">Enfants</div>
+
+  <div style="display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 18px; background: #FFFFFF;">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <div style="font-size: 18px; font-weight: 700;">Enfant A</div>
+      <button type="button" style="height: 40px; padding: 0 14px; border: 2px solid #C9C7BE; border-radius: 12px; background: #FFFFFF; color: #1E2A28; font-size: 14px; font-weight: 700;">Modifier le nom</button>
+    </div>
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <span style="font-size: 13px; color: #5B6664;">Code secret</span>
+        <span style="display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 700; letter-spacing: 2px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>{{ aCode }}</span>
+      </div>
+      <button type="button" onClick="{{ toggleA }}" style="height: 40px; padding: 0 14px; border: 0; border-radius: 12px; background: #E3F1EC; color: #1F5C3A; font-size: 14px; font-weight: 700;">{{ aToggle }}</button>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 18px; background: #FFFFFF;">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <div style="font-size: 18px; font-weight: 700;">Enfant B</div>
+      <button type="button" style="height: 40px; padding: 0 14px; border: 2px solid #C9C7BE; border-radius: 12px; background: #FFFFFF; color: #1E2A28; font-size: 14px; font-weight: 700;">Modifier le nom</button>
+    </div>
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <span style="font-size: 13px; color: #5B6664;">Code secret</span>
+        <span style="display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 700; letter-spacing: 2px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0;"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>{{ bCode }}</span>
+      </div>
+      <button type="button" onClick="{{ toggleB }}" style="height: 40px; padding: 0 14px; border: 0; border-radius: 12px; background: #E3F1EC; color: #1F5C3A; font-size: 14px; font-weight: 700;">{{ bToggle }}</button>
+    </div>
+  </div>
+
+  <button type="button" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 52px; border: 2px dashed #9A9890; border-radius: 16px; background: transparent; color: #1E2A28; font-size: 16px; font-weight: 700;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Ajouter un enfant</button>
+
+  <div style="font-size: 19px; font-weight: 700; margin-top: 8px;">Espace parent</div>
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px; border-radius: 18px; background: #FFFFFF;">
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+      <span style="font-size: 13px; color: #5B6664;">Code parent</span>
+      <span style="font-size: 20px; font-weight: 700; letter-spacing: 2px;">● ● ● ●</span>
+    </div>
+    <button type="button" style="height: 40px; padding: 0 14px; border: 2px solid #C9C7BE; border-radius: 12px; background: #FFFFFF; color: #1E2A28; font-size: 14px; font-weight: 700;">Modifier</button>
+  </div>
+
+  <div style="flex-grow: 1;"></div>
+  <div style="display: flex; gap: 12px; padding: 16px; border-radius: 18px; background: #F1EFE8; font-size: 15px; line-height: 1.5;">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 2px;"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+    <div>Les codes sont visibles par le parent et ne sont pas chiffrés. Un enfant sans code accède directement à son profil.</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1100}}'>
+class Component extends DCLogic {
+  state = { aOn: true, bOn: false };
+
+  renderVals() {
+    const aOn = this.state.aOn;
+    const bOn = this.state.bOn;
+    return {
+      aCode: aOn ? '2580' : 'Aucun',
+      bCode: bOn ? '1357' : 'Aucun',
+      aToggle: aOn ? 'Retirer le code' : 'Ajouter un code',
+      bToggle: bOn ? 'Retirer le code' : 'Ajouter un code',
+      toggleA: () => this.setState({ aOn: !this.state.aOn }),
+      toggleB: () => this.setState({ bOn: !this.state.bOn }),
+    };
+  }
+}
+</script>
+</body>
+</html>

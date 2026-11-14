@@ -1,0 +1,26 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-11-14T10:00:00Z"},
+  "title": "Entraînement aux calculs",
+  "launch": {"view": "canvas"},
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 390, "h": 844, "title": "Accès (qui se connecte ?)", "is_interactive": true},
+    "ParentSetup.dc.html": {"x": 470, "y": 0, "w": 390, "h": 844, "title": "Première configuration parent", "is_interactive": true},
+    "PinParent.dc.html": {"x": 940, "y": 0, "w": 390, "h": 844, "title": "Code parent", "is_interactive": true},
+    "PinChild.dc.html": {"x": 1410, "y": 0, "w": 390, "h": 844, "title": "Code enfant", "is_interactive": true},
+    "Home.dc.html": {"x": 1880, "y": 0, "w": 390, "h": 844, "title": "Accueil", "is_interactive": true},
+    "Exercise.dc.html": {"x": 2350, "y": 0, "w": 390, "h": 844, "title": "Série de calculs", "is_interactive": true},
+    "Result.dc.html": {"x": 2820, "y": 0, "w": 390, "h": 1000, "title": "Bilan de la série", "is_interactive": true},
+    "Parent.dc.html": {"x": 3290, "y": 0, "w": 390, "h": 1500, "title": "Statistiques enfants", "is_interactive": true},
+    "Evaluation.dc.html": {"x": 3760, "y": 0, "w": 390, "h": 844, "title": "Évaluation (25 questions)", "is_interactive": true},
+    "ParentConfig.dc.html": {"x": 4230, "y": 0, "w": 390, "h": 1100, "title": "Configuration parent", "is_interactive": true}
+  },
+  "order": ["Main.dc.html", "ParentSetup.dc.html", "PinParent.dc.html", "PinChild.dc.html", "Home.dc.html", "Exercise.dc.html", "Result.dc.html", "Parent.dc.html", "Evaluation.dc.html", "ParentConfig.dc.html"],
+  "notes": {
+    "title-acces": {"x": 0, "y": -200, "text": "Accès et configuration parent", "kind": "title1", "maxW": 1840},
+    "title-eleve": {"x": 1880, "y": -200, "text": "Parcours élève", "kind": "title1", "maxW": 1840},
+    "title-parent": {"x": 3290, "y": -200, "text": "Espace parent", "kind": "title1", "maxW": 1400}
+  },
+  "designSystems": []
+}
