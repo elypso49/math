@@ -1,0 +1,82 @@
+@import '@fontsource/atkinson-hyperlegible/400.css';
+@import '@fontsource/atkinson-hyperlegible/700.css';
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Atkinson Hyperlegible', system-ui, sans-serif;
+
+  --color-paper: #f6f5f1;
+  --color-ink: #1e2a28;
+  --color-muted: #5b6664;
+  --color-line: #c9c7be;
+  --color-stitch: #9a9890;
+  --color-key: #e9e7e0;
+  --color-sand: #f1efe8;
+  --color-track: #e0ded6;
+
+  --color-brand: #2e7d6b;
+  --color-brand-dark: #23604f;
+  --color-brand-soft: #e3f1ec;
+  --color-brand-light: #9cc9bb;
+
+  --color-success: #1f5c3a;
+  --color-warning: #6b4a00;
+  --color-warning-bar: #c98a1b;
+  --color-warning-soft: #fdf1dc;
+  --color-danger: #8a1c12;
+  --color-danger-bar: #b42318;
+  --color-danger-soft: #fdecea;
+  --color-info: #23457f;
+  --color-info-soft: #e6eefa;
+}
+
+html,
+body,
+#root {
+  min-height: 100dvh;
+}
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+.icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-8px);
+  }
+  75% {
+    transform: translateX(8px);
+  }
+}
+
+.shake {
+  animation: shake 0.3s ease-in-out 2;
+}
