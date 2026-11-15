@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react';
 import type { StatTab } from '../../components/parent/stats/StatTabs';
 import { useChildSessions, useFamily } from '../family/family.context';
-import { overallLevel } from '../exercise/levels';
+import { activeOperations } from '../exercise/series';
+import { gradeOf, gradeProgress } from '../learning/grades';
+import { timeline } from '../learning/mastery';
 import { frontierSkills } from '../learning/skills';
 import { operationStats } from './operationStats';
 import { figures, fragileSkills, insights, lastEvaluation, weekSummary } from './stats';
@@ -10,7 +12,8 @@ import { figures, fragileSkills, insights, lastEvaluation, weekSummary } from '.
  * Figures of the parent dashboard for the child picked in the chips, and the
  * detail of the operation picked in the tabs.
  * @param initialChildId Child selected first, the first child when null.
- * @returns The selected child and tab, their handlers and the statistics.
+ * @returns The selected child and tab, their handlers, the statistics and how the
+ * child stands against what their school year expects.
  */
 export function useParentStats(initialChildId: string | null = null) {
   const { family } = useFamily();
@@ -30,6 +33,19 @@ export function useParentStats(initialChildId: string | null = null) {
     };
   }, [sessions]);
 
+  const progress = useMemo(() => {
+    if (!child?.grade)
+      return null;
+    const grade = child.grade;
+    const answers = timeline(sessions).map((entry) => entry.answer);
+    const operations = activeOperations(child.operations);
+    return {
+      grade: gradeOf(grade),
+      overall: gradeProgress(grade, operations, answers),
+      byOperation: operations.map((operation) => ({ operation, progress: gradeProgress(grade, [operation], answers) })),
+    };
+  }, [child, sessions]);
+
   const detail = useMemo(() => {
     if (tab === 'overview' || !child)
       return null;
@@ -46,7 +62,7 @@ export function useParentStats(initialChildId: string | null = null) {
     select: setSelectedId,
     tab,
     setTab,
-    overall: child ? overallLevel(child.levels, child.operations) : null,
+    progress,
     detail,
     ...overview,
   };

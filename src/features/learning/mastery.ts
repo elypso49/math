@@ -15,13 +15,13 @@ export type MasteryBand = 'unseen' | 'fragile' | 'learning' | 'solid' | 'automat
 /** Mastery of a skill or an item, computed from its latest answers. */
 export interface Mastery {
   attempts: number;
-  /** Recency-weighted share of right answers, from 0 to 1. */
+  /** Recency-weighted share of right answers, a hesitant one counting for 0.75, from 0 to 1. */
   accuracy: number;
   /** Median answer time of the right answers, or null without any. */
   medianMs: number | null;
   /** 1 at or under the target time, 0 at three times the target. */
   speed: number;
-  /** Combined score, from 0 to 1: accuracy weighs most, speed refines it. */
+  /** Combined score, from 0 to 1: accuracy and speed weigh half each. */
   score: number;
   band: MasteryBand;
 }
@@ -31,6 +31,15 @@ export const MASTERY_WINDOW = 12;
 
 /** Weight lost by each older answer when averaging. */
 export const RECENCY_DECAY = 0.85;
+
+/** Credit of a right answer typed after erasing digits, a sign of hesitation. */
+export const HESITATION_CREDIT = 0.75;
+
+const credit = (answer: Answer) => {
+  if (!answer.correct)
+    return 0;
+  return answer.erasures ? HESITATION_CREDIT : 1;
+};
 
 /**
  * Flattens the sessions into a chronological list of answers.
@@ -84,11 +93,11 @@ export function measure(answers: readonly Answer[], targetMs: number): Mastery {
     return { attempts: 0, accuracy: 0, medianMs: null, speed: 0, score: 0, band: 'unseen' };
 
   const weights = recent.map((_, index) => RECENCY_DECAY ** (recent.length - 1 - index));
-  const accuracy = recent.reduce((total, answer, index) => total + (answer.correct ? weights[index]! : 0), 0) /
+  const accuracy = recent.reduce((total, answer, index) => total + credit(answer) * weights[index]!, 0) /
     weights.reduce((total, weight) => total + weight, 0);
   const medianMs = median(recent.filter((answer) => answer.correct).map((answer) => answer.durationMs));
   const speed = medianMs === null ? 0 : Math.min(1, Math.max(0, (3 * targetMs - medianMs) / (2 * targetMs)));
-  const score = accuracy * (0.6 + 0.4 * speed);
+  const score = accuracy * (0.5 + 0.5 * speed);
 
   return { attempts: answers.length, accuracy, medianMs, speed, score, band: bandOf(answers.length, score, speed) };
 }

@@ -1,4 +1,4 @@
-import type { Level, LevelChange, Operation, Session } from '../../types/math.types';
+import type { LevelChange, Operation, Session } from '../../types/math.types';
 import { skillMastery, timeline } from '../learning/mastery';
 import { skill } from '../learning/skills';
 
@@ -8,18 +8,6 @@ export const OPERATION_NAMES: Record<Operation, string> = {
   sub: 'Soustractions',
   mul: 'Multiplications',
   div: 'Divisions',
-};
-
-/** Visual tone of a level, from struggling to mastered. */
-export type LevelTone = 'danger' | 'warning' | 'neutral' | 'success';
-
-/** Label and tone shown next to a level. */
-export const LEVEL_LABELS: Record<Level, { label: string; tone: LevelTone }> = {
-  1: { label: 'Débutant', tone: 'danger' },
-  2: { label: 'À consolider', tone: 'warning' },
-  3: { label: 'En progrès', tone: 'neutral' },
-  4: { label: 'Maîtrisé', tone: 'success' },
-  5: { label: 'Expert', tone: 'success' },
 };
 
 /** Figures of one finished session. */

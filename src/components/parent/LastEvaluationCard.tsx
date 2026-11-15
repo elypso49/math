@@ -1,19 +1,20 @@
 import { formatDay, formatDuration } from '../../features/stats/stats';
-import { MAX_LEVEL, type Level } from '../../types/math.types';
 
 interface LastEvaluationCardProps {
   finishedAt: string;
   total: number;
   correct: number;
   averageMs: number;
-  overall: Level;
+  /** Where the child stands against their school year, or null when it is not set. */
+  expected: string | null;
 }
 
 /**
- * Date, score, mean time and overall level of the latest evaluation.
- * @param props Figures of the evaluation and the current overall level.
+ * Date, score and mean time of the latest evaluation, with where the child stands
+ * against their school year.
+ * @param props Figures of the evaluation and the current standing.
  */
-export const LastEvaluationCard = ({ finishedAt, total, correct, averageMs, overall }: LastEvaluationCardProps) => (
+export const LastEvaluationCard = ({ finishedAt, total, correct, averageMs, expected }: LastEvaluationCardProps) => (
   <div className="flex flex-col gap-2 rounded-[18px] bg-white p-[18px]">
     <div className="text-[17px] font-bold">Dernière évaluation</div>
     <div className="text-[15px] text-muted">
@@ -21,8 +22,8 @@ export const LastEvaluationCard = ({ finishedAt, total, correct, averageMs, over
     </div>
     <div className="mt-1.5 flex gap-3">
       <Figure label="Temps moyen" value={formatDuration(averageMs)} />
-      <Figure label="Niveau global" value={`${overall} / ${MAX_LEVEL}`} />
     </div>
+    {expected && <div className="text-[15px] font-bold">{expected}</div>}
   </div>
 );
 

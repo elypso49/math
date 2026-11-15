@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
-import { SkillBars } from '../components/parent/SkillBars';
 import { AnswerList } from '../components/result/AnswerList';
 import { EarnedBadges, EncouragementBanner } from '../components/result/EncouragementBanner';
 import { ScoreCard, TimeCard } from '../components/result/ScoreCard';
@@ -44,13 +43,7 @@ export function ResultPage({ child }: { child: Child }) {
       {main && <EncouragementBanner encouragement={main} />}
       <EarnedBadges badges={others.filter((badge) => badge.badge)} />
 
-      {evaluation && (
-        <>
-          <h2 className="m-0 mt-1 text-xl font-bold">Ton niveau</h2>
-          <SkillBars levels={child.levels} operations={child.operations} />
-          <p className="m-0 text-[15px] text-muted">Tes prochains entraînements s’adaptent à ce niveau.</p>
-        </>
-      )}
+      {evaluation && <p className="m-0 text-[15px] text-muted">Tes prochains entraînements s’adaptent à ce que tu sais faire.</p>}
 
       <TimeCard label="Temps total" value={formatDuration(session.durationMs)} />
       <AnswerList answers={session.answers} />

@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import type { Child, Operation } from '../../types/math.types';
+import type { Child, Grade, Operation } from '../../types/math.types';
 import { useAccess } from '../access/access.context';
 import { useSession } from '../session/session.context';
 import { useFamily } from './family.context';
@@ -60,6 +60,7 @@ export function useParentConfig() {
     addChild: (name: string) => run(() => addChild(name)).then((done) => done && setAdding(false)),
     rename: (child: Child, name: string) => run(() => saveChild(child, { name: name.trim() })),
     setPin: (child: Child, pin: string | null) => run(() => saveChild(child, { pin })),
+    setGrade: (child: Child, grade: Grade | null) => run(() => saveChild(child, { grade })),
     toggleOperation,
     remove: (child: Child) => run(() => removeChild(child.id)),
     changeParentPin: (pin: string) => run(() => setParentPin(pin)),

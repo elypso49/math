@@ -1,17 +1,23 @@
 import { MAX_LEVEL, MIN_LEVEL, type Answer, type Level, type Levels, type Operation, type Session } from '../../types/math.types';
-import { activeOperations } from './series';
+import { skillsOfCalculation } from '../learning/classify';
+import { skill } from '../learning/skills';
 
 /** Share of right answers at a level for the evaluation to grant it. */
-export const EVALUATION_PASS = 0.5;
+export const EVALUATION_PASS = 2 / 3;
 
-const clamp = (value: number): Level => Math.min(MAX_LEVEL, Math.max(MIN_LEVEL, value)) as Level;
+/** Answer time, in multiples of the skill's target, past which a right answer does not count. */
+export const EVALUATION_SLOWNESS = 3;
+
+const counts = (answer: Answer) =>
+  answer.correct && answer.durationMs <= EVALUATION_SLOWNESS * skill(skillsOfCalculation(answer)[0]!).targetMs;
 
 const accuracy = (answers: readonly Answer[]) =>
-  answers.length === 0 ? 0 : answers.filter((answer) => answer.correct).length / answers.length;
+  answers.length === 0 ? 0 : answers.filter(counts).length / answers.length;
 
 /**
  * Estimates the level of each operation from an evaluation: the child climbs
- * level by level as long as at least half of the questions of that level are right.
+ * level by level as long as two thirds of the questions of that level are right,
+ * a right answer taking over three times its target time counting as missed.
  * An operation left out of the evaluation keeps its level.
  * @param answers The evaluation answers.
  * @param previous Levels before the evaluation.
@@ -37,6 +43,32 @@ export function estimateLevels(answers: readonly Answer[], previous: Levels): Le
 }
 
 /**
+ * Applies the current evaluation rule again to the latest evaluation of each
+ * operation that no training has moved since, so that a level granted by an
+ * earlier, more lenient rule comes back to what that evaluation shows. A level
+ * is only ever lowered; running it again changes nothing.
+ * @param levels Current levels of the child.
+ * @param sessions Sessions of the child, in any order.
+ * @returns The recalibrated levels.
+ */
+export function recalibrateLevels(levels: Levels, sessions: readonly Session[]): Levels {
+  const ordered = [...sessions].sort((left, right) => left.finishedAt.localeCompare(right.finishedAt));
+  const recalibrate = (operation: Operation): Level => {
+    const evaluation = ordered
+      .filter((session) => session.kind === 'evaluation' && session.answers.some((answer) => answer.operation === operation))
+      .at(-1);
+    if (!evaluation)
+      return levels[operation];
+    const movedSince = ordered.some(
+      (session) => session.finishedAt > evaluation.finishedAt && session.changes.some((change) => change.operation === operation),
+    );
+    return movedSince ? levels[operation] : (Math.min(levels[operation], estimateLevels(evaluation.answers, levels)[operation]) as Level);
+  };
+
+  return { add: recalibrate('add'), sub: recalibrate('sub'), mul: recalibrate('mul'), div: recalibrate('div') };
+}
+
+/**
  * Flattens the training answers of a child, oldest first.
  * @param sessions Sessions of the child, in any order.
  * @returns Every training answer in chronological order.
@@ -46,14 +78,3 @@ export const trainingHistory = (sessions: readonly Session[]): Answer[] =>
     .filter((session) => session.kind === 'training')
     .sort((left, right) => left.finishedAt.localeCompare(right.finishedAt))
     .flatMap((session) => session.answers);
-
-/**
- * Rounds the mean level of the operations the child practises.
- * @param levels Levels of a child.
- * @param operations Operations chosen by the parent.
- * @returns The overall level, from 1 to 5.
- */
-export function overallLevel(levels: Levels, operations: readonly Operation[]): Level {
-  const practised = activeOperations(operations);
-  return clamp(Math.round(practised.reduce((total, operation) => total + levels[operation], 0) / practised.length));
-}

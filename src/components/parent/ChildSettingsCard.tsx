@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { GRADES } from '../../features/learning/grades';
 import { OPERATION_NAMES } from '../../features/stats/stats';
-import { OPERATIONS, type Child, type Operation } from '../../types/math.types';
+import { OPERATIONS, type Child, type Grade, type Operation } from '../../types/math.types';
 import { Button } from '../ui/Button';
 import { Icon } from '../ui/Icon';
 import { InlineEdit } from './InlineEdit';
@@ -11,6 +12,7 @@ interface ChildSettingsCardProps {
   suggestedPin: () => string;
   onRename: (name: string) => Promise<boolean>;
   onSetPin: (pin: string | null) => Promise<boolean>;
+  onSetGrade: (grade: Grade | null) => void;
   onToggleOperation: (operation: Operation) => void;
   onDelete: () => void;
 }
@@ -18,10 +20,10 @@ interface ChildSettingsCardProps {
 type Editing = 'none' | 'name' | 'pin';
 
 /**
- * Settings of one child: name, secret code, practised operations and removal.
+ * Settings of one child: name, secret code, school year, practised operations and removal.
  * @param props The child, the pending state and the edit handlers.
  */
-export function ChildSettingsCard({ child, busy, suggestedPin, onRename, onSetPin, onToggleOperation, onDelete }: ChildSettingsCardProps) {
+export function ChildSettingsCard({ child, busy, suggestedPin, onRename, onSetPin, onSetGrade, onToggleOperation, onDelete }: ChildSettingsCardProps) {
   const [editing, setEditing] = useState<Editing>('none');
   const close = (done: boolean) => done && setEditing('none');
 
@@ -79,6 +81,23 @@ export function ChildSettingsCard({ child, busy, suggestedPin, onRename, onSetPi
           </div>
         </div>
       )}
+
+      <label className="flex flex-col gap-1.5">
+        <span className="text-[13px] text-muted">Classe</span>
+        <select
+          value={child.grade ?? ''}
+          disabled={busy}
+          onChange={(event) => onSetGrade((event.target.value || null) as Grade | null)}
+          className="h-11 rounded-xl border-2 border-line bg-white px-3 text-base font-bold text-ink"
+        >
+          <option value="">Non renseignée</option>
+          {GRADES.map((grade) => (
+            <option key={grade.id} value={grade.id}>
+              {grade.label}
+            </option>
+          ))}
+        </select>
+      </label>
 
       <fieldset className="m-0 flex flex-col gap-2 border-0 p-0">
         <legend className="mb-2 p-0 text-[13px] text-muted">Opérations des entraînements</legend>

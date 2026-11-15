@@ -65,6 +65,13 @@ describe('measure', () => {
     expect(result.speed).toBe(1);
   });
 
+  it('counts a right answer typed after erasing as hesitant', () => {
+    const sure = measure(Array.from({ length: 6 }, () => answer('mul', 7, 8, true)), 3_000);
+    const hesitant = measure(Array.from({ length: 6 }, () => ({ ...answer('mul', 7, 8, true), erasures: 1 })), 3_000);
+    expect(hesitant.accuracy).toBeCloseTo(0.75);
+    expect(hesitant.score).toBeLessThan(sure.score);
+  });
+
   it('keeps slow but right answers below automatic', () => {
     const result = measure(Array.from({ length: 6 }, () => answer('mul', 7, 8, true, 8_000)), 3_000);
     expect(result.band).not.toBe('automatic');
@@ -140,7 +147,7 @@ describe('adaptLevels', () => {
   const levels: Levels = { ...initialLevels(), mul: 1 };
 
   it('opens the next tables once those of the level are mastered', () => {
-    const answers = [1, 2, 5, 10].flatMap((table) => Array.from({ length: 6 }, (_, index) => answer('mul', table, index + 1, true)));
+    const answers = [1, 2, 5, 10].flatMap((table) => Array.from({ length: 8 }, (_, index) => answer('mul', table, index + 1, true)));
     const result = adaptLevels(levels, [], answers);
     expect(result.levels.mul).toBe(2);
     expect(result.changes[0]?.reason).toBe('mastered');
@@ -154,7 +161,20 @@ describe('adaptLevels', () => {
     expect(adaptLevels(levels, [], answers).changes).toEqual([]);
   });
 
-  it('steps back when the new tables stay under half right', () => {
+  it('leaves second chances out of the promotion', () => {
+    const answers = [1, 2, 5, 10].flatMap((table) =>
+      Array.from({ length: 8 }, (_, index) => ({ ...answer('mul', table, index + 1, true), reason: index === 0 ? 'retry' : 'practice' })),
+    );
+    expect(adaptLevels(levels, [], answers).changes).toEqual([]);
+  });
+
+  it('judges a level only from the answers given since the evaluation that placed it', () => {
+    const before = session('2026-11-10T10:00:00Z', Array.from({ length: 8 }, () => answer('mul', 3, 4, false)));
+    const evaluation = session('2026-11-11T10:00:00Z', [answer('mul', 3, 4, true)], 'evaluation');
+    expect(adaptLevels({ ...initialLevels(), mul: 2 }, [before, evaluation], []).changes).toEqual([]);
+  });
+
+  it('steps back when the new tables stay under 60 % right', () => {
     const answers = Array.from({ length: 8 }, (_, index) => answer('mul', 3 + (index % 2), index + 2, index < 2));
     const result = adaptLevels({ ...initialLevels(), mul: 2 }, [], answers);
     expect(result.levels.mul).toBe(1);

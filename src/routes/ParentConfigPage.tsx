@@ -10,7 +10,7 @@ import { Screen, Spacer } from '../components/ui/Screen';
 import { randomPin, useParentConfig } from '../features/family/useParentConfig';
 import type { Child } from '../types/math.types';
 
-/** Parent configuration: children, their codes and operations, and the parent code. */
+/** Parent configuration: children, their codes, school years and operations, and the parent code. */
 export function ParentConfigPage() {
   const config = useParentConfig();
   const [editingParentPin, setEditingParentPin] = useState(false);
@@ -37,6 +37,7 @@ export function ParentConfigPage() {
           suggestedPin={randomPin}
           onRename={(name) => config.rename(child, name)}
           onSetPin={(pin) => config.setPin(child, pin)}
+          onSetGrade={(grade) => void config.setGrade(child, grade)}
           onToggleOperation={(operation) => void config.toggleOperation(child, operation)}
           onDelete={() => setRemoving(child)}
         />

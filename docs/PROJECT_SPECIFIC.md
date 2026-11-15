@@ -10,8 +10,12 @@ mécanisme de sécurité : ils sont stockés en clair et visibles par le parent.
 ## Exercices
 
 Une **évaluation** compte 25 questions : les opérations activées par le parent à chacun des
-5 niveaux, dans un ordre mélangé. Une opération désactivée garde son niveau. Elle fixe les niveaux : l'enfant monte d'un niveau tant qu'au moins la
-moitié des questions de ce niveau sont justes. Le bouton rouge « C'est trop dur » passe
+5 niveaux, dans un ordre mélangé. Une opération désactivée garde son niveau. Elle fixe les niveaux : l'enfant monte d'un niveau tant que les
+deux tiers des questions de ce niveau sont justes ; une réponse juste donnée en plus de
+trois fois le temps visé compte comme fausse. Au chargement de la famille, la dernière
+évaluation de chaque opération qu'aucun entraînement n'a fait bouger depuis est relue
+avec cette règle (`recalibrateLevels`) : un niveau accordé par une règle plus ancienne
+et plus clémente redescend, jamais il ne monte, et relancer le calcul ne change rien. Le bouton rouge « C'est trop dur » passe
 une question : elle compte comme fausse et une nouvelle question de la même opération et
 du même niveau s'ajoute à la fin, dans la limite de 25 questions ajoutées.
 
@@ -42,8 +46,9 @@ compétences : tables 1, 2, 5, 10, puis 3 et 4, puis 6 à 9, puis 11 et 12, puis
 nombres.
 
 **Maîtrise** (`mastery.ts`) : calculée sur les 12 dernières réponses, les plus récentes
-pesant le plus. La réussite pèse 60 %, la vitesse affine le reste : 1 sous le temps
-visé, 0 à trois fois ce temps. Le temps visé d'un fait est de 3 s, seuil courant de
+pesant le plus. Une réponse juste tapée après avoir effacé des chiffres compte pour 0,75.
+La réussite et la vitesse pèsent moitié-moitié : la vitesse vaut 1 sous le temps visé,
+0 à trois fois ce temps. Le temps visé d'un fait est de 3 s, seuil courant de
 l'automaticité (la réponse vient de mémoire, sans compter sur les doigts). Bandes :
 fragile, en cours, solide, automatisé.
 
@@ -64,10 +69,24 @@ la même opération). Une erreur revient trois questions plus tard pour une deux
 (deux au plus par série).
 
 **Progression** (`progression.ts`) : le niveau d'une opération monte quand chaque
-compétence qu'il a ouverte atteint 0,8 de maîtrise sur au moins 6 réponses et que les
-plus simples tiennent ; il baisse quand ses nouvelles compétences restent sous une réponse
-juste sur deux, ou à plus de trois fois le temps visé. Seules les réponses données depuis
-le dernier changement comptent.
+compétence qu'il a ouverte atteint 0,8 de maîtrise sur au moins 8 réponses, deuxièmes
+chances exclues, et que les plus simples tiennent ; il baisse, dès 6 réponses, quand ses
+nouvelles compétences restent sous 60 % de réussite ou à plus de deux fois et demie le
+temps visé. Seules les réponses données depuis le dernier changement, ou depuis la
+dernière évaluation de l'opération, comptent.
+
+**Niveau attendu** (`grades.ts`) : le parent renseigne la classe de l'enfant, de la
+maternelle à la terminale. Chaque classe attend un ensemble de compétences, cumulé
+d'une année sur l'autre (repères proposés : tables de 2, 5 et 10 en CE1, toutes les
+tables jusqu'à 9 en CE2, divisions et 3 chiffres en CM1…), avec un temps toléré qui
+diminue avec l'âge (3 fois le temps visé en maternelle, 1 fois à partir de la 6e).
+L'espace parent affiche la part de ces attentes atteinte : une compétence compte
+entièrement à 0,8 de maîtrise dans le temps toléré, une compétence jamais travaillée
+ne compte pas. Au-delà de 90 % des attentes de sa classe, l'enfant est situé à la
+classe la plus haute dont il remplit les attentes ; le contenu de l'application
+s'arrête au calcul mental attendu en 6e. Le niveau d'entraînement de 1 à 5 reste
+interne : il règle la difficulté des séries et n'est plus affiché, ni à l'enfant ni au
+parent.
 
 **Mesures par question** : temps de réflexion (jusqu'au premier chiffre), temps de
 réponse (jusqu'à la validation), temps de lecture de la correction, chiffres effacés.
@@ -98,7 +117,7 @@ Toutes les routes exigent une session (`RequireSharedAuth`, jeton obtenu par
 | `GET /api/maths/family` | Code parent et enfants |
 | `PUT /api/maths/family/parent-pin` | Change le code parent |
 | `POST /api/maths/children` | Ajoute un enfant |
-| `PUT /api/maths/children/{id}` | Remplace les réglages et niveaux d'un enfant |
+| `PUT /api/maths/children/{id}` | Remplace les réglages, la classe (`grade`, nullable) et les niveaux d'un enfant |
 | `DELETE /api/maths/children/{id}` | Supprime un enfant et ses séries |
 | `GET /api/maths/sessions` | Séries et évaluations terminées |
 | `POST /api/maths/sessions` | Enregistre une série, avec les temps de chaque question ; renvoyer le même identifiant ne crée rien |

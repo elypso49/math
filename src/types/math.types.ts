@@ -16,6 +16,9 @@ export const MAX_LEVEL: Level = 5;
 /** Current difficulty of each operation for one child. */
 export type Levels = Record<Operation, Level>;
 
+/** School year of a child, from nursery school to the last year of high school. */
+export type Grade = 'mat' | 'cp' | 'ce1' | 'ce2' | 'cm1' | 'cm2' | '6e' | '5e' | '4e' | '3e' | '2nde' | '1re' | 'tle';
+
 /** A child profile of the family. */
 export interface Child {
   id: string;
@@ -27,6 +30,8 @@ export interface Child {
   /** Operations included in the training series. */
   operations: Operation[];
   levels: Levels;
+  /** School year, set by the parent; missing until then. */
+  grade?: Grade | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -38,6 +43,7 @@ export interface ChildInput {
   colour: number;
   operations: Operation[];
   levels: Levels;
+  grade: Grade | null;
 }
 
 /** The family account, owned by the parent who signed in with Google. */

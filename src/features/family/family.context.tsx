@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { api } from '../../lib/api';
 import type { Child, ChildInput, Family, Levels, Session } from '../../types/math.types';
+import { recalibrateLevels } from '../exercise/levels';
 import { DEFAULT_OPERATIONS, initialLevels } from '../exercise/series';
 import { useSession } from '../session/session.context';
 
@@ -23,10 +24,28 @@ export interface FamilyValue {
 
 const FamilyContext = createContext<FamilyValue | null>(null);
 
-const toInput = ({ name, pin, colour, operations, levels }: Child): ChildInput => ({ name, pin, colour, operations, levels });
+const toInput = ({ name, pin, colour, operations, levels, grade }: Child): ChildInput => ({
+  name,
+  pin,
+  colour,
+  operations,
+  levels,
+  grade: grade ?? null,
+});
 
 const sameLevels = (left: Levels, right: Levels) =>
   left.add === right.add && left.sub === right.sub && left.mul === right.mul && left.div === right.div;
+
+const recalibrated = async (child: Child, sessions: readonly Session[]): Promise<Child> => {
+  const levels = recalibrateLevels(child.levels, sessions.filter((session) => session.childId === child.id));
+  if (sameLevels(levels, child.levels))
+    return child;
+  try {
+    return await api.updateChild(child.id, { ...toInput(child), levels });
+  } catch {
+    return child;
+  }
+};
 
 /**
  * Loads the family of the signed-in parent and keeps it in step with every write.
@@ -44,7 +63,8 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
     setError(null);
     try {
       const [loadedFamily, loadedSessions] = await Promise.all([api.getFamily(), api.listSessions()]);
-      setFamily(loadedFamily);
+      const children = await Promise.all(loadedFamily.children.map((child) => recalibrated(child, loadedSessions)));
+      setFamily({ ...loadedFamily, children });
       setSessions(loadedSessions);
       setStatus('ready');
     } catch (failure) {
@@ -78,6 +98,7 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
         colour: family?.children.length ?? 0,
         operations: DEFAULT_OPERATIONS,
         levels: initialLevels(),
+        grade: null,
       });
       setFamily((current) => current && { ...current, children: [...current.children, created] });
       return created;

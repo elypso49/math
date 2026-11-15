@@ -34,7 +34,7 @@ export function ParentStatsPage() {
           {detail ? (
             <OperationStatsView operation={detail.operation} stats={detail.stats} targetMs={detail.targetMs} />
           ) : (
-            <OverviewPanel child={child} overall={stats.overall} evaluation={stats.evaluation} insights={stats.insights} week={stats.week} />
+            <OverviewPanel child={child} progress={stats.progress} evaluation={stats.evaluation} insights={stats.insights} week={stats.week} />
           )}
         </>
       )}

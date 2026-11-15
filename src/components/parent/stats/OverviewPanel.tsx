@@ -1,15 +1,20 @@
+import type { GradeExpectation, GradeProgress } from '../../../features/learning/grades';
 import type { Insight, WeekSummary } from '../../../features/stats/stats';
-import type { Child, Level, Session } from '../../../types/math.types';
+import type { Child, Operation, Session } from '../../../types/math.types';
 import { LinkButton } from '../../ui/Button';
 import { Icon } from '../../ui/Icon';
 import { Notice } from '../../ui/Notice';
 import { LastEvaluationCard, NoEvaluationCard } from '../LastEvaluationCard';
-import { SkillBars } from '../SkillBars';
+import { describeProgress, SkillBars } from '../SkillBars';
 import { WeekStats } from '../WeekStats';
 
 interface OverviewPanelProps {
   child: Child;
-  overall: Level | null;
+  progress: {
+    grade: GradeExpectation;
+    overall: GradeProgress;
+    byOperation: { operation: Operation; progress: GradeProgress }[];
+  } | null;
   evaluation: { session: Session; total: number; correct: number; averageMs: number } | null;
   insights: readonly Insight[];
   week: WeekSummary;
@@ -23,22 +28,27 @@ const SectionTitle = ({ icon, children }: { icon: 'target' | 'calendar'; childre
 );
 
 /**
- * Overview of a child: levels, latest evaluation, what the algorithm adjusted, and the week.
+ * Overview of a child: share of what their school year expects, latest evaluation,
+ * what the algorithm adjusted, and the week.
  * @param props The child and its summarised figures.
  */
-export function OverviewPanel({ child, overall, evaluation, insights, week }: OverviewPanelProps) {
+export function OverviewPanel({ child, progress, evaluation, insights, week }: OverviewPanelProps) {
   return (
     <>
       <SectionTitle icon="target">{`Ce que sait faire ${child.name}`}</SectionTitle>
-      <SkillBars levels={child.levels} operations={child.operations} />
+      {progress ? (
+        <SkillBars grade={progress.grade} rows={progress.byOperation} />
+      ) : (
+        <Notice>{`Indique la classe de ${child.name} dans les réglages pour comparer ses calculs au niveau attendu.`}</Notice>
+      )}
 
-      {evaluation && overall ? (
+      {evaluation ? (
         <LastEvaluationCard
           finishedAt={evaluation.session.finishedAt}
           total={evaluation.total}
           correct={evaluation.correct}
           averageMs={evaluation.averageMs}
-          overall={overall}
+          expected={progress && describeProgress(progress.grade, progress.overall)}
         />
       ) : (
         <NoEvaluationCard />
