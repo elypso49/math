@@ -1,0 +1,26 @@
+name: Artifact cleanup
+
+on:
+  workflow_run:
+    workflows:
+      - 'Math Build & Deploy'
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  actions: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Keep only the two latest artifacts of each kind
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh api "repos/$REPO/actions/artifacts?per_page=100" --paginate \
+            --jq '.artifacts[] | select(.expired == false) | [.id, (.name | sub("~[A-Za-z0-9]+\\.dockerbuild$"; "~dockerbuild")), .created_at] | @tsv' \
+            | sort -t $'\t' -k2,2 -k3,3r \
+            | awk -F '\t' '++seen[$2] > 2 { print $1 }' \
+            | xargs -r -I{} gh api -X DELETE "repos/$REPO/actions/artifacts/{}"
